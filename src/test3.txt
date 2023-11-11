@@ -1,0 +1,87 @@
+==========================================Test nr 3.
+Zadanie 01:
+Pliki noworodki.txt oraz mamy.txt zawierają dane o dzieciach i ich matkach.
+W pliku noworodki.txt każdy wiersz zawiera następujące informacje o jednym dziecku,
+rozdzielone znakami odstępu: identyfikator, płeć (c – córka, s – syn), imię, data urodzenia, waga [g], wzrost [cm] oraz identyfikator matki.
+Przykład:
+1 c Agnieszka 20-lis-1999 2450 48 33
+W pliku mamy.txt każdy wiersz zawiera informacje o jednej kobiecie, rozdzielone znakami odstępu: identyfikator matki, imię, wiek.
+Przykład:
+1 Agata 25
+Identyfikator matki z pliku noworodki.txt odpowiada identyfikatorowi w pliku mamy.txt.
+Wykorzystując dane zawarte w plikach mamy.txt i noworodki.txt wykonaj ponizsze podpunkty:
+
+a) Podaj imię i wzrost najwyższego chłopca oraz imię i wzrost najwyższej dziewczynki.
+b) W którym dniu tygodnia urodziło się najwięcej dzieci? Podaj dzien tygodnia i liczbe dzieci.
+c) Podaj imiona kobiet w wieku poniżej 25 lat, które urodziły dzieci o wadze powyżej 4000 g.
+d) Podaj imiona i daty urodzenia dziewczynek, które odziedziczyły imię po matce.
+e) Znajdz matki które urodziły bliźnięta.
+
+uwaga: nalezy zaimplementowac 2 kierunkowe relacje i uzywac tych relacji do podpunktow,
+pamietaj tez ze Matka ma liste dzieci a dziecko ma MATKE nie id Matki tylko matke.
+jesli mimo tych uwag popelnisz ktoras z gaf opisanych powyzej, tracisz mozliwosc poprawki :(
+dodatkowo pamiętaj o małych metodach i o zasadach z poprzednich testów.
+
+Zadanie 02:
+Dane są trzy pliki tekstowe o nazwach: lekarze.txt, pacjenci.txt, wizyty.txt.
+Zawierają one informacje na temat lekarzy, pacjentów i odbytych wizyt domowych.
+W każdym z plików dane w wierszu oddzielone są znakami tabulacji.
+Plik o nazwie lekarze.txt zawiera informacje na temat lekarzy: numer identyfikacyjny
+lekarza, jego nazwisko, imię, specjalność, datę urodzenia, numer NIP i numer PESEL.
+Przykład:
+23 Kadaj Monika pediatra 1965-03-16 879-122-69-94 65031687654
+34 Nowak Anna nefrolog 1965-03-16 879-122-69-94 65031687654
+Plik o nazwie pacjenci.txt zawiera dane na temat pacjentów: numer identyfikacyjny
+pacjenta, jego nazwisko, imię, numer PESEL i datę urodzenia.
+Przykład:
+122 Nowakowska Joanna 73050512356 1973-05-05
+124 Witkowski Hubert 88030422345 1988-03-04
+Plik o nazwie wizyty.txt zawiera informacje na temat domowych wizyt lekarskich
+przeprowadzonych przez lekarzy u pacjentów: numer identyfikacyjny lekarza, numer
+identyfikacyjny pacjenta oraz datę wizyty lekarskiej przeprowadzonej przez lekarza
+u pacjenta.
+Przykład:
+23 124 2006-12-13
+34 122 2007-02-20
+
+Wykorzystując informacje zawarte w plikach wykonaj następujące polecenia:
+- znajdź lekarza ktory miał najwięcej wizyt
+- znajdź pacjenta który miał najwięcej wizyt
+- która specalizacja cieszy się największym powodzeniem?
+- którego roku było najwięcej wizyt?
+- wypisz top 5 najstarszych lekarzy
+- wypisz top 5 lekarzy co mieli najwiecej wizyt
+- zwroc pacientow ktorzy byli u minumum 5ciu roznych lekarzy
+- zwroc lekarzy ktorzy przyjeli tylko jednego pacjenta
+
+UWAGA: w plikach mogą być dane złośliwe, należy je pominać, dane złośliwe to np: lekarz ze zduplikowanym
+numerem NIP (bierzemy pierwszego o takim numerze)
+lub id pacjenta / id lekarza w wizyty.txt ktore nie istnieje w lekarze.txt lub pacjenci.txt
+
+Zadanie 03:
+Stworz klase Osoba (imie, nazwisko, pesel, miasto)
+klase Student (grupa, stypendium)
+oraz Pracownik (stanowisko, pensja)
+stworz tablice Osob w ktorej beda zarowno studenci jak i pracownicy
+- znajdz osobe z najwiekszym dochodem (dochod dla studenta to jego stypendium a dla pracownika jego pensja)
+- policz ile jest kobiet w tablicy (osoba powinna miec metode getPlec() ktora oblicza plec na bazie nr pesel)
+
+Zadanie 04
+a) Napisz kod w taki sposób aby poniższy fragment zadziałał i dał dokładnie taki wynik jak oczekuje:
+ Figura[] figury = {Figura.stworzKwadrat(10), Figura.stworzKolo(20), Figura.stworzProstokat(10,20)};
+ for(Figura f : figury {
+   System.out.println(f);
+ }
+System.out powinien wypisac:
+Figura nr 1: Kwadrat o boku 10.
+Figura nr 2: Koło o promienu 10.
+Figura nr 3: Prostokat o bokach 10x20.
+
+b) Następnie:
+- znajdź figurę z największym obwodem
+- znajdź figurę z największym polem
+
+c) System.out.prinltn(figuryPunktA.contains(new Kwadrat(10)); //powinno wypisc true
+
+UWAGA: tylko figury tworzone metodą fabryczną powinny mieć nadawany sekwencyjnie numer, w przypadku gdy uzywamy konstruktora to kazda
+figura ma numer 0.
