@@ -5,12 +5,13 @@ import java.util.Objects;
 public class Kwadrat extends Figura {
     private double bok;
 
-    public Kwadrat(double bok) {
-        this(bok, false);
+    public Kwadrat(double bok, int numer) {
+        super(numer);
+        this.bok = bok;
     }
 
-    public Kwadrat(double bok, boolean czyNadacNumer) {
-        super(czyNadacNumer);
+    public Kwadrat(double bok) {
+        super(0);
         this.bok = bok;
     }
 

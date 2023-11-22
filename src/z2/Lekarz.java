@@ -1,8 +1,8 @@
 package z2;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Lekarz {
     private int idLekarza;
@@ -12,21 +12,29 @@ public class Lekarz {
     private Date dataUrodzenia;
     private String nip;
     private String pesel;
+    private List<Wizyta> listaWizyt;
 
-    public Lekarz(int idLekarza, String nazwisko, String imie, String specjalnosc, String dataUrodzenia, String nip, String pesel) throws ParseException {
+    public Lekarz(int idLekarza, String nazwisko, String imie, String specjalnosc, Date dataUrodzenia, String nip, String pesel, List<Wizyta> listaWizyt) {
         this.idLekarza = idLekarza;
         this.nazwisko = nazwisko;
         this.imie = imie;
         this.specjalnosc = specjalnosc;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        this.dataUrodzenia = sdf.parse(dataUrodzenia);
+        this.dataUrodzenia = dataUrodzenia;
         this.nip = nip;
         this.pesel = pesel;
+        this.listaWizyt = new ArrayList<>();
+    }
+
+    public void dodajWizyte(Wizyta wizyta) {
+        if (!listaWizyt.contains(wizyta)) {
+            this.listaWizyt.add(wizyta);
+        }
     }
 
     @Override
     public String toString() {
-        return nazwisko + " " + imie + " " + " - " + specjalnosc;
+        return "nazwisko='" + nazwisko + '\'' +
+                ", imie='" + imie + '\'';
     }
 
     public int getIdLekarza() {
@@ -84,4 +92,14 @@ public class Lekarz {
     public void setPesel(String pesel) {
         this.pesel = pesel;
     }
+
+    public List<Wizyta> getListaWizyt() {
+        return listaWizyt;
+    }
+
+    public void setListaWizyt(List<Wizyta> listaWizyt) {
+        this.listaWizyt = listaWizyt;
+    }
+
+
 }

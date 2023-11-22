@@ -3,33 +3,48 @@ package z2;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 public class Wizyta {
-    private int idLekarza;
-    private int idPacjenta;
+    private Lekarz lekarz;
+    private Pacjent pacjent;
     private Date dataWizyty;
 
-    public Wizyta(int idLekarza, int idPacjenta, String dataWizyty) throws ParseException {
-        this.idLekarza = idLekarza;
-        this.idPacjenta = idPacjenta;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        this.dataWizyty = sdf.parse(dataWizyty);
+    public Wizyta(Lekarz lekarz, Pacjent pacjent, Date dataWizyty) {
+        this.lekarz = lekarz;
+        this.pacjent = pacjent;
+        this.dataWizyty = dataWizyty;
     }
 
-    public int getIdLekarza() {
-        return idLekarza;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Wizyta wizyta = (Wizyta) obj;
+        return Objects.equals(lekarz, wizyta.lekarz) &&
+                Objects.equals(pacjent, wizyta.pacjent) &&
+                Objects.equals(dataWizyty, wizyta.dataWizyty);
     }
 
-    public void setIdLekarza(int idLekarza) {
-        this.idLekarza = idLekarza;
+    @Override
+    public int hashCode() {
+        return Objects.hash(lekarz, pacjent, dataWizyty);
     }
 
-    public int getIdPacjenta() {
-        return idPacjenta;
+    public Lekarz getLekarz() {
+        return lekarz;
     }
 
-    public void setIdPacjenta(int idPacjenta) {
-        this.idPacjenta = idPacjenta;
+    public void setLekarz(Lekarz lekarz) {
+        this.lekarz = lekarz;
+    }
+
+    public Pacjent getPacjent() {
+        return pacjent;
+    }
+
+    public void setPacjent(Pacjent pacjent) {
+        this.pacjent = pacjent;
     }
 
     public Date getDataWizyty() {

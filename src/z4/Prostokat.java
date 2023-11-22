@@ -6,15 +6,18 @@ public class Prostokat extends Figura {
     private double szerokosc;
     private double wysokosc;
 
-    public Prostokat(double szerokosc, double wysokosc) {
-        this(szerokosc, wysokosc, false);
-    }
-
-    public Prostokat(double szerokosc, double wysokosc, boolean czyNadacNumer) {
-        super(czyNadacNumer);
+    public Prostokat(double szerokosc, double wysokosc, int numer) {
+        super(numer);
         this.szerokosc = szerokosc;
         this.wysokosc = wysokosc;
     }
+
+    public Prostokat(double szerokosc, double wysokosc) {
+        super(0);
+        this.szerokosc = szerokosc;
+        this.wysokosc = wysokosc;
+    }
+
 
     @Override
     public double obwod() {

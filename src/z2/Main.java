@@ -6,145 +6,127 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        List<Lekarz> lekarze = wczytajLekarzy("src/z2/lekarze.txt");
-        List<Pacjent> pacjenci = wczytajPacjentow("src/z2/pacjenci.txt");
-        List<Wizyta> wizyty = wczytajWizyty("src/z2/wizyty.txt", lekarze, pacjenci);
+        try {
+            List<Lekarz> lekarze = wczytajLekarzy("src/z2/lekarze.txt");
+            List<Pacjent> pacjenci = wczytajPacjentow("src/z2/pacjenci.txt");
+            List<Wizyta> wizyty = wczytajWizyty("src/z2/wizyty.txt", lekarze, pacjenci);
 
-        Map<Integer, Integer> liczbaWizytLekarzy = new HashMap<>();
-        Map<Integer, Integer> liczbaWizytPacjentow = new HashMap<>();
+            if (znajdzLekarzaZNajwiekszaLiczbaWizyt(lekarze) != null) {
+                System.out.println("Lekarz z największą liczbą wizyt: " + znajdzLekarzaZNajwiekszaLiczbaWizyt(lekarze).toString());
+            }
+            if (znajdzPacjentaZNajwiekszaLiczbaWizyt(pacjenci) != null) {
+                System.out.println("Pacjent z największą liczbą wizyt: " + znajdzPacjentaZNajwiekszaLiczbaWizyt(pacjenci).toString());
+            }
 
-        for (Wizyta wizyta : wizyty) {
-            int idLekarza = wizyta.getIdLekarza();
-            liczbaWizytLekarzy.put(idLekarza, liczbaWizytLekarzy.getOrDefault(idLekarza, 0) + 1);
+            System.out.println("Najpopularniejsza specjalizacje: " + znajdzNajpopularniejszaSpecjalizacje(lekarze));
+            znajdzNajwiecejWizytWRoku(wizyty);
+            wypiszTop5NajstarszychLekarzy(lekarze);
+            wypiszTop5LekarzyZNajwiecejWizyt(lekarze);
+            znajdzPacjentowZCoNajmniej5Lekarzami(pacjenci);
+            znajdzLekarzyZJednymPacjentem(lekarze);
+
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
         }
-
-        for (Wizyta wizyta : wizyty) {
-            int idPacjenta = wizyta.getIdPacjenta();
-            liczbaWizytPacjentow.put(idPacjenta, liczbaWizytPacjentow.getOrDefault(idPacjenta, 0) + 1);
-        }
-
-        System.out.println("Najczęściej odwiedzający lekarz: " + znajdzLekarza(lekarze, znajdzNajczestszego(liczbaWizytLekarzy)));
-        System.out.println("Najczęściej odwiedzający pacjent: " + znajdzPacjenta(pacjenci, znajdzNajczestszego(liczbaWizytPacjentow)));
-        System.out.println("Najpopularniejsza specjalizacja: " + znajdzNajpopularniejszaSpecjalizacje(lekarze, wizyty));
-        znajdzNajwiecejWizytWRoku(wizyty);
-        wypiszTop5NajstarszychLekarzy(lekarze);
-        wypiszTop5LekarzyZaNajwiecejWizyt(lekarze, wizyty);
-        znajdzPacjentowZCoNajmniej5Lekarzami(wizyty, pacjenci); //nikt nie odwiedził 5 lekarzy, najwieksza ilosc odwiedzonych lekarzy to 3 przez jedną osobę
-        znajdzLekarzyZJednymPacjentem(wizyty, lekarze);
     }
 
-
-    private static List<Lekarz> wczytajLekarzy(String fileName) {
+    public static List<Lekarz> wczytajLekarzy(String nazwaPliku) throws IOException, ParseException {
         List<Lekarz> lekarze = new ArrayList<>();
-        Set<String> unikalniLekarze = new HashSet<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (line.startsWith("Id_lekarza")) {
+        try (BufferedReader br = new BufferedReader(new FileReader(nazwaPliku))) {
+            String linia;
+            while ((linia = br.readLine()) != null) {
+                if (linia.startsWith("Id_lekarza")) {
                     continue;
                 }
+                String[] elementy = linia.split("\t");
 
-                String[] parts = line.split("[\\t\\s]+");
-                int idLekarza = Integer.parseInt(parts[0]);
-                String nazwisko = parts[1];
-                String imie = parts[2];
-                String specjalnosc = parts[3];
-                String dataUrodzenia = parts[4];
-                String nip = parts[5];
-                String pesel = parts[6];
-
-                if (unikalniLekarze.add(nip)) {
-                    lekarze.add(new Lekarz(idLekarza, nazwisko, imie, specjalnosc, dataUrodzenia, nip, pesel));
+                if (elementy.length == 7) {
+                    Lekarz lekarz = new Lekarz(
+                            Integer.parseInt(elementy[0]), // idLekarza
+                            elementy[1], // nazwisko
+                            elementy[2], // imie
+                            elementy[3], // specjalnosc
+                            new SimpleDateFormat("yyyy-MM-dd").parse(elementy[4]), // dataUrodzenia
+                            elementy[5], // nip
+                            elementy[6], // pesel
+                            new ArrayList<>() // listaWizyt
+                    );
+                    lekarze.add(lekarz);
+                } else {
+                    System.out.println("Błąd: Nieprawidłowa liczba elementów w linii: " + linia);
                 }
             }
-        } catch (ParseException | IOException e) {
-            throw new RuntimeException(e);
         }
         return lekarze;
     }
 
-    private static List<Pacjent> wczytajPacjentow(String fileName) {
-        List<Pacjent> pacjenci = new ArrayList<>();
-        Set<String> unikalniPacjenci = new HashSet<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (line.startsWith("Id_pacjenta")) {
+    public static List<Pacjent> wczytajPacjentow(String sciezkaPliku) throws IOException, ParseException {
+        List<Pacjent> pacjenci = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(sciezkaPliku))) {
+            String linia;
+
+            while ((linia = reader.readLine()) != null) {
+                if (linia.startsWith("Id_pacjenta")) {
                     continue;
                 }
-                String[] parts = line.split("[\\t\\s]+");
-                int idPacjenta = Integer.parseInt(parts[0]);
-                String nazwisko = parts[1];
-                String imie = parts[2];
-                String pesel = parts[3];
-                String dataUrodzenia = parts[4];
+                String[] dane = linia.split("\t");
 
-                if (unikalniPacjenci.add(pesel)) {
-                    pacjenci.add(new Pacjent(idPacjenta, nazwisko, imie, pesel, dataUrodzenia));
+                if (dane.length == 5) {
+                    Pacjent pacjent = new Pacjent(
+                            Integer.parseInt(dane[0]), // id
+                            dane[1], // nazwisko
+                            dane[2], // imie
+                            dane[3], // adres
+                            new SimpleDateFormat("yyyy-MM-dd").parse(dane[4]) // data urodzenia
+                    );
+                    pacjenci.add(pacjent);
+                } else {
+                    System.out.println("Błąd: Nieprawidłowa liczba elementów w linii: " + linia);
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
+            return pacjenci;
         }
-        return pacjenci;
     }
 
-    private static List<Wizyta> wczytajWizyty(String fileName, List<Lekarz> lekarze, List<Pacjent> pacjenci) {
-        List<Wizyta> wizyty = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (line.startsWith("Id_lekarza")) {
+    public static List<Wizyta> wczytajWizyty(String sciezkaPliku, List<Lekarz> lekarze, List<Pacjent> pacjenci) throws IOException, ParseException {
+        List<Wizyta> wizyty = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(sciezkaPliku))) {
+            String linia;
+
+            while ((linia = reader.readLine()) != null) {
+                if (linia.startsWith("Id_lekarza")) {
                     continue;
                 }
+                String[] dane = linia.split("\t");
 
-                String[] parts = line.split("[\\t\\s]+");
-                int idLekarza = Integer.parseInt(parts[0]);
-                int idPacjenta = Integer.parseInt(parts[1]);
-                String dataWizyty = parts[2];
+                if (dane.length == 3) {
+                    int idLekarza = Integer.parseInt(dane[0]);
+                    int idPacjenta = Integer.parseInt(dane[1]);
+                    Date dataWizyty = new SimpleDateFormat("yyyy-MM-dd").parse(dane[2]);
 
-                if (czyIdentyfikatoryIstnieja(idLekarza, idPacjenta, lekarze, pacjenci)) {
-                    wizyty.add(new Wizyta(idLekarza, idPacjenta, dataWizyty));
+                    Lekarz lekarz = znajdzLekarza(lekarze, idLekarza);
+                    Pacjent pacjent = znajdzPacjenta(pacjenci, idPacjenta);
+                    if (lekarz != null && pacjent != null) {
+                        Wizyta wizyta = new Wizyta(lekarz, pacjent, dataWizyty);
+                        wizyty.add(wizyta);
+                        lekarz.dodajWizyte(wizyta);
+                        pacjent.dodajWizytePacjenta(wizyta);
+                    }
                 } else {
-                    throw new IllegalArgumentException("Błąd w pliku wizyty.txt: Nieprawidłowe id lekarza lub pacjenta.");
+                    System.err.println("Błąd: Nieprawidłowa liczba elementów w linii: " + linia);
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
         }
-
         return wizyty;
     }
 
-    private static int znajdzNajczestszego(Map<Integer, Integer> mapa) {
-        int idNajczestszy = -1;
-        int maxLiczbaWizyt = -1;
-
-        for (Map.Entry<Integer, Integer> entry : mapa.entrySet()) {
-            if (entry.getValue() > maxLiczbaWizyt) {
-                maxLiczbaWizyt = entry.getValue();
-                idNajczestszy = entry.getKey();
-            }
-        }
-
-        return idNajczestszy;
-    }
 
     private static Lekarz znajdzLekarza(List<Lekarz> lekarze, int idLekarza) {
         for (Lekarz lekarz : lekarze) {
@@ -164,47 +146,59 @@ public class Main {
         return null;
     }
 
-    private static boolean czyIdentyfikatoryIstnieja(int idLekarza, int idPacjenta, List<Lekarz> lekarze, List<Pacjent> pacjenci) {
-        for (Lekarz lekarz : lekarze) {
-            if (lekarz.getIdLekarza() == idLekarza) {
-                for (Pacjent pacjent : pacjenci) {
-                    if (pacjent.getIdPacjenta() == idPacjenta) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    public static String znajdzNajpopularniejszaSpecjalizacje(List<Lekarz> lekarze, List<Wizyta> wizyty) {
-        Map<String, Integer> licznikSpecjalizacji = new HashMap<>();
-
-        for (Lekarz lekarz : lekarze) {
-            licznikSpecjalizacji.put(lekarz.getSpecjalnosc(), 0);
-        }
-
-        for (Wizyta wizyta : wizyty) {
-            int idLekarza = wizyta.getIdLekarza();
-            for (Lekarz lekarz : lekarze) {
-                if (lekarz.getIdLekarza() == idLekarza) {
-                    String specjalizacja = lekarz.getSpecjalnosc();
-                    licznikSpecjalizacji.put(specjalizacja, licznikSpecjalizacji.get(specjalizacja) + 1);
-                    break;
-                }
-            }
-        }
-
-        String najpopularniejszaSpecjalizacja = null;
+    public static Lekarz znajdzLekarzaZNajwiekszaLiczbaWizyt(List<Lekarz> lekarze) {
+        Lekarz lekarzZNajwiekszaLiczbaWizyt = null;
         int maxLiczbaWizyt = 0;
 
-        for (Map.Entry<String, Integer> entry : licznikSpecjalizacji.entrySet()) {
-            if (entry.getValue() > maxLiczbaWizyt) {
-                najpopularniejszaSpecjalizacja = entry.getKey();
-                maxLiczbaWizyt = entry.getValue();
+        for (Lekarz lekarz : lekarze) {
+            int liczbaWizyt = lekarz.getListaWizyt().size();
+            if (liczbaWizyt > maxLiczbaWizyt) {
+                maxLiczbaWizyt = liczbaWizyt;
+                lekarzZNajwiekszaLiczbaWizyt = lekarz;
             }
         }
-        return najpopularniejszaSpecjalizacja + " - liczba wizyt: " + maxLiczbaWizyt;
+
+        return lekarzZNajwiekszaLiczbaWizyt;
+    }
+
+    public static Pacjent znajdzPacjentaZNajwiekszaLiczbaWizyt(List<Pacjent> pacjenci) {
+        Pacjent pacjentZNajwiekszaLiczbaWizyt = null;
+        int maxLiczbaWizyt = 0;
+
+        for (Pacjent pacjent : pacjenci) {
+            int liczbaWizyt = pacjent.getListaWizytPacjenta().size();
+            if (liczbaWizyt > maxLiczbaWizyt) {
+                maxLiczbaWizyt = liczbaWizyt;
+                pacjentZNajwiekszaLiczbaWizyt = pacjent;
+            }
+        }
+
+        return pacjentZNajwiekszaLiczbaWizyt;
+    }
+
+    public static List<String> znajdzNajpopularniejszaSpecjalizacje(List<Lekarz> lekarze) {
+        Map<String, Integer> specjalizacjeLicznik = new HashMap<>();
+
+        for (Lekarz lekarz : lekarze) {
+            String specjalizacja = lekarz.getSpecjalnosc();
+            specjalizacjeLicznik.put(specjalizacja, specjalizacjeLicznik.getOrDefault(specjalizacja, 0) + 1);
+        }
+
+        int maxLiczbaWizyt = 0;
+        List<String> najlepszeSpecjalizacje = new ArrayList<>();
+
+        for (Map.Entry<String, Integer> entry : specjalizacjeLicznik.entrySet()) {
+            int liczbaWizyt = entry.getValue();
+            if (liczbaWizyt > maxLiczbaWizyt) {
+                maxLiczbaWizyt = liczbaWizyt;
+                najlepszeSpecjalizacje.clear();
+                najlepszeSpecjalizacje.add(entry.getKey());
+            } else if (liczbaWizyt == maxLiczbaWizyt) {
+                najlepszeSpecjalizacje.add(entry.getKey());
+            }
+        }
+
+        return najlepszeSpecjalizacje;
     }
 
     private static void znajdzNajwiecejWizytWRoku(List<Wizyta> wizyty) {
@@ -219,7 +213,6 @@ public class Main {
                 wizytyPerRok.put(rok, wizytyPerRok.get(rok) + 1);
             }
         }
-
         int rokZNajwiecejWizytami = 0;
         int maxWizyt = 0;
         for (Map.Entry<Integer, Integer> entry : wizytyPerRok.entrySet()) {
@@ -238,7 +231,6 @@ public class Main {
 
     public static void wypiszTop5NajstarszychLekarzy(List<Lekarz> lekarze) {
         List<Lekarz> top5Najstarszych = new ArrayList<>(5);
-
         for (int i = 0; i < Math.min(5, lekarze.size()); i++) {
             Lekarz najstarszy = null;
             for (Lekarz lekarz : lekarze) {
@@ -248,82 +240,89 @@ public class Main {
             }
             top5Najstarszych.add(najstarszy);
         }
-
         System.out.println("\nTop 5 najstarszych lekarzy:");
         for (Lekarz lekarz : top5Najstarszych) {
             System.out.println(lekarz);
         }
     }
 
-    public static void wypiszTop5LekarzyZaNajwiecejWizyt(List<Lekarz> lekarze, List<Wizyta> wizyty) {
-        Map<Integer, Integer> licznikWizytLekarzy = new HashMap<>();
 
-        for (Wizyta wizyta : wizyty) {
-            int idLekarza = wizyta.getIdLekarza();
-            licznikWizytLekarzy.put(idLekarza, licznikWizytLekarzy.getOrDefault(idLekarza, 0) + 1);
+    public static void wypiszTop5LekarzyZNajwiecejWizyt(List<Lekarz> lekarze) {
+        Map<Lekarz, Integer> licznikWizytLekarzy = new HashMap<>();
+        for (Lekarz lekarz : lekarze) {
+            licznikWizytLekarzy.put(lekarz, lekarz.getListaWizyt().size());
         }
-
-        List<Lekarz> top5NajwiecejWizyt = new ArrayList<>(5);
-
+        List<Lekarz> top5NajwiecejWizyt = new ArrayList<>();
         for (int i = 0; i < Math.min(5, lekarze.size()); i++) {
-            Lekarz najwiecejWizyt = null;
+            Lekarz lekarzZNajwiecejWizytami = null;
             for (Lekarz lekarz : lekarze) {
-                if (!top5NajwiecejWizyt.contains(lekarz) && (najwiecejWizyt == null || licznikWizytLekarzy.getOrDefault(lekarz.getIdLekarza(), 0) > licznikWizytLekarzy.getOrDefault(najwiecejWizyt.getIdLekarza(), 0))) {
-                    najwiecejWizyt = lekarz;
+                if (!top5NajwiecejWizyt.contains(lekarz)) {
+                    if (lekarzZNajwiecejWizytami == null || licznikWizytLekarzy.get(lekarz) > licznikWizytLekarzy.get(lekarzZNajwiecejWizytami)) {
+                        lekarzZNajwiecejWizytami = lekarz;
+                    }
                 }
             }
-            top5NajwiecejWizyt.add(najwiecejWizyt);
+            if (lekarzZNajwiecejWizytami != null) {
+                top5NajwiecejWizyt.add(lekarzZNajwiecejWizytami);
+            }
         }
-
         System.out.println("\nTop 5 lekarzy z największą liczbą wizyt:");
         for (Lekarz lekarz : top5NajwiecejWizyt) {
-            System.out.println(lekarz + " - liczba wizyt: " + licznikWizytLekarzy.getOrDefault(lekarz.getIdLekarza(), 0));
+            System.out.println(lekarz.getNazwisko() + " " + lekarz.getImie() + " - liczba wizyt: " + licznikWizytLekarzy.get(lekarz));
         }
     }
 
-    public static void znajdzPacjentowZCoNajmniej5Lekarzami(List<Wizyta> wizyty, List<Pacjent> pacjenci) {
-        Map<Integer, Set<Integer>> pacjenciDoLekarzy = new HashMap<>();
-        for (Wizyta wizyta : wizyty) {
-            pacjenciDoLekarzy.computeIfAbsent(wizyta.getIdPacjenta(), k -> new HashSet<>()).add(wizyta.getIdLekarza());
+    public static void znajdzPacjentowZCoNajmniej5Lekarzami(List<Pacjent> pacjenci) {
+        Map<Pacjent, Set<Integer>> pacjenciDoLekarzy = new HashMap<>();
+
+        for (Pacjent pacjent : pacjenci) {
+            Set<Integer> idLekarzy = new HashSet<>();
+            for (Wizyta wizyta : pacjent.getListaWizytPacjenta()) {
+                idLekarzy.add(wizyta.getLekarz().getIdLekarza());
+            }
+            pacjenciDoLekarzy.put(pacjent, idLekarzy);
         }
 
-        Map<Integer, String> idDoNazwiskaPacjenta = new HashMap<>();
-        for (Pacjent pacjent : pacjenci) {
-            idDoNazwiskaPacjenta.put(pacjent.getIdPacjenta(), pacjent.getImie() + " " + pacjent.getNazwisko());
-        }
         boolean znaleziono = false;
-        for (Map.Entry<Integer, Set<Integer>> entry : pacjenciDoLekarzy.entrySet()) {
+        for (Map.Entry<Pacjent, Set<Integer>> entry : pacjenciDoLekarzy.entrySet()) {
             if (entry.getValue().size() >= 5) {
-                System.out.println("\nPacjent " + idDoNazwiskaPacjenta.get(entry.getKey()) + " odwiedził co najmniej 5 różnych lekarzy");
+                Pacjent pacjent = entry.getKey();
+                System.out.println("\nPacjent " + pacjent.getImie() + " " + pacjent.getNazwisko() + " odwiedził co najmniej 5 różnych lekarzy");
                 znaleziono = true;
             }
         }
+
         if (!znaleziono) {
             System.out.println("\nNie znaleziono pacjenta, który odwiedził co najmniej 5 różnych lekarzy");
         }
     }
 
-    public static void znajdzLekarzyZJednymPacjentem(List<Wizyta> wizyty, List<Lekarz> lekarze) {
-        Map<Integer, Set<Integer>> lekarzeDoPacjentow = new HashMap<>();
-        for (Wizyta wizyta : wizyty) {
-            lekarzeDoPacjentow.computeIfAbsent(wizyta.getIdLekarza(), k -> new HashSet<>()).add(wizyta.getIdPacjenta());
+    public static void znajdzLekarzyZJednymPacjentem(List<Lekarz> lekarze) {
+        Map<Lekarz, Set<Integer>> lekarzeDoPacjentow = new HashMap<>();
+
+        for (Lekarz lekarz : lekarze) {
+            Set<Integer> idPacjentow = new HashSet<>();
+            for (Wizyta wizyta : lekarz.getListaWizyt()) {
+                idPacjentow.add(wizyta.getPacjent().getIdPacjenta());
+            }
+            lekarzeDoPacjentow.put(lekarz, idPacjentow);
         }
 
-        Map<Integer, String> idDoNazwiskaLekarza = new HashMap<>();
-        for (Lekarz lekarz : lekarze) {
-            idDoNazwiskaLekarza.put(lekarz.getIdLekarza(), lekarz.getImie() + " " + lekarz.getNazwisko());
-        }
         boolean znaleziono = false;
-        for (Map.Entry<Integer, Set<Integer>> entry : lekarzeDoPacjentow.entrySet()) {
+        for (Map.Entry<Lekarz, Set<Integer>> entry : lekarzeDoPacjentow.entrySet()) {
             if (entry.getValue().size() == 1) {
-                System.out.println("\nLekarz " + idDoNazwiskaLekarza.get(entry.getKey()) + " przyjął tylko jednego pacjenta");
+                Lekarz lekarz = entry.getKey();
+                System.out.println("\nLekarz " + lekarz.getImie() + " " + lekarz.getNazwisko() + " przyjął tylko jednego pacjenta");
                 znaleziono = true;
             }
         }
+
         if (!znaleziono) {
             System.out.println("\nNie znaleziono lekarza, który przyjął tylko 1 pacjenta");
         }
     }
+
+
 }
 
 

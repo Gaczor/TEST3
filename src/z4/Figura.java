@@ -4,11 +4,13 @@ public abstract class Figura {
     private static int licznik = 0;
     protected final int numer;
 
-    protected Figura(boolean czyNadacNumer) {
-        this.numer = czyNadacNumer ? ++licznik : 0;
+    protected Figura(int numer) {
+        this.numer = 0;
     }
 
+
     public abstract double obwod();
+
     public abstract double pole();
 
     @Override
@@ -19,14 +21,15 @@ public abstract class Figura {
     protected abstract String opis();
 
     public static Figura stworzKwadrat(double bok) {
-        return new Kwadrat(bok, true);
+        return new Kwadrat(bok, ++licznik);
     }
 
     public static Figura stworzKolo(double promien) {
-        return new Kolo(promien, true);
+        return new Kolo(promien, ++licznik);
     }
 
     public static Figura stworzProstokat(double szerokosc, double wysokosc) {
-        return new Prostokat(szerokosc, wysokosc, true);
+        return new Prostokat(szerokosc, wysokosc, ++licznik);
     }
+
 }

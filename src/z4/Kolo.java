@@ -5,8 +5,13 @@ import java.util.Objects;
 public class Kolo extends Figura {
     private double promien;
 
-    public Kolo(double promien, boolean czyNadacNumer) {
-        super(czyNadacNumer);
+    public Kolo(double promien, int numer) {
+        super(numer);
+        this.promien = promien;
+    }
+
+    public Kolo(double promien) {
+        super(0);
         this.promien = promien;
     }
 
