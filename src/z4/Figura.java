@@ -2,34 +2,41 @@ package z4;
 
 public abstract class Figura {
     private static int licznik = 0;
-    protected final int numer;
+    protected int numer;
 
-    protected Figura(int numer) {
-        this.numer = 0;
+    public Figura() {
+        licznik++;
+        this.numer = licznik;
     }
 
 
-    public abstract double obwod();
+    public static Figura stworzKwadrat(int bok) {
+        return new Kwadrat(bok);
+    }
 
-    public abstract double pole();
+    public static Figura stworzKolo(int promien) {
+        return new Kolo(promien);
+    }
+
+    public static Figura stworzProstokat(int dlugosc, int szerokosc) {
+        return new Prostokat(dlugosc, szerokosc);
+    }
+
+    public Figura(int numer) {
+        this.numer = numer;
+    }
+
+    public int getNumer() {
+        return numer;
+    }
+
+    public void setNumer(int numer) {
+        this.numer = numer;
+    }
+
+    abstract double obwod();
+    abstract double pole();
 
     @Override
-    public String toString() {
-        return "Figura nr " + numer + ": " + opis();
-    }
-
-    protected abstract String opis();
-
-    public static Figura stworzKwadrat(double bok) {
-        return new Kwadrat(bok, ++licznik);
-    }
-
-    public static Figura stworzKolo(double promien) {
-        return new Kolo(promien, ++licznik);
-    }
-
-    public static Figura stworzProstokat(double szerokosc, double wysokosc) {
-        return new Prostokat(szerokosc, wysokosc, ++licznik);
-    }
-
+    public abstract String toString();
 }

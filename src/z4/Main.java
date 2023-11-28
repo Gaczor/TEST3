@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        Figura[] figury = {Figura.stworzKwadrat(10), Figura.stworzKolo(20), Figura.stworzProstokat(10, 20)};
+        Figura[] figury = {Figura.stworzKwadrat(10), Figura.stworzKolo(10), Figura.stworzProstokat(10, 20)};
         for (Figura f : figury) {
             System.out.println(f);
         }
@@ -13,6 +13,13 @@ public class Main {
         System.out.println("Figura z największym obwodem: " + znajdzFigureZNajwiekszymObwodem(figury));
         System.out.println("Figura z największym polem: " + znajdzFigureZNajwiekszymPolem(figury));
         System.out.println(figuryPunktA.contains(new Kwadrat(10)));
+
+        Figura kwadrat3 = new Kwadrat(10);
+        if (kwadrat3.getNumer() == 0) {
+            System.out.println("Numer figury to 0.");
+        } else {
+            System.out.println("Numer figury to " + kwadrat3.getNumer());
+        }
     }
 
 

@@ -23,12 +23,39 @@ public class Main {
             }
 
             System.out.println("Najpopularniejsza specjalizacje: " + znajdzNajpopularniejszaSpecjalizacje(lekarze));
-            znajdzNajwiecejWizytWRoku(wizyty);
-            wypiszTop5NajstarszychLekarzy(lekarze);
-            wypiszTop5LekarzyZNajwiecejWizyt(lekarze);
-            znajdzPacjentowZCoNajmniej5Lekarzami(pacjenci);
-            znajdzLekarzyZJednymPacjentem(lekarze);
 
+            if (znajdzNajwiecejWizytWRoku(wizyty) != null) {
+                System.out.println("Rok z największą liczbą wizyt: " + znajdzNajwiecejWizytWRoku(wizyty)[0] +
+                        ", liczba wizyt: " + znajdzNajwiecejWizytWRoku(wizyty)[1]);
+            } else {
+                System.out.println("Brak danych o wizytach.");
+            }
+
+            System.out.println("Top 5 najstarszych lekarzy:");
+            for (Lekarz lekarz : wypiszTop5NajstarszychLekarzy(lekarze)) {
+                System.out.println(lekarz);
+            }
+
+            System.out.println("Top 5 lekarzy z największą liczbą wizyt:");
+            for (Lekarz lekarz : wypiszTop5LekarzyZNajwiecejWizyt(lekarze)) {
+                System.out.println(lekarz.getNazwisko() + " " + lekarz.getImie() + " - liczba wizyt: " + lekarz.getListaWizyt().size());
+            }
+
+            if (znajdzPacjentowZCoNajmniej5Lekarzami(pacjenci).isEmpty()) {
+                System.out.println("Nie znaleziono pacjentów, którzy odwiedzili co najmniej 5 różnych lekarzy");
+            } else {
+                for (Pacjent pacjent : znajdzPacjentowZCoNajmniej5Lekarzami(pacjenci)) {
+                    System.out.println("Pacjent " + pacjent.getImie() + " " + pacjent.getNazwisko() + " odwiedził co najmniej 5 różnych lekarzy");
+                }
+            }
+
+            if (znajdzLekarzyZJednymPacjentem(lekarze).isEmpty()) {
+                System.out.println("Nie znaleziono lekarzy, którzy przyjęli tylko jednego pacjenta");
+            } else {
+                for (Lekarz lekarz : znajdzLekarzyZJednymPacjentem(lekarze)) {
+                    System.out.println("Lekarz " + lekarz.getImie() + " " + lekarz.getNazwisko() + " przyjął tylko jednego pacjenta");
+                }
+            }
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
@@ -201,18 +228,15 @@ public class Main {
         return najlepszeSpecjalizacje;
     }
 
-    private static void znajdzNajwiecejWizytWRoku(List<Wizyta> wizyty) {
+    public static int[] znajdzNajwiecejWizytWRoku(List<Wizyta> wizyty) {
         Map<Integer, Integer> wizytyPerRok = new HashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
 
         for (Wizyta wizyta : wizyty) {
             int rok = Integer.parseInt(sdf.format(wizyta.getDataWizyty()));
-            if (!wizytyPerRok.containsKey(rok)) {
-                wizytyPerRok.put(rok, 1);
-            } else {
-                wizytyPerRok.put(rok, wizytyPerRok.get(rok) + 1);
-            }
+            wizytyPerRok.put(rok, wizytyPerRok.getOrDefault(rok, 0) + 1);
         }
+
         int rokZNajwiecejWizytami = 0;
         int maxWizyt = 0;
         for (Map.Entry<Integer, Integer> entry : wizytyPerRok.entrySet()) {
@@ -222,104 +246,86 @@ public class Main {
             }
         }
 
-        if (rokZNajwiecejWizytami > 0) {
-            System.out.println("Rok z największą liczbą wizyt: " + rokZNajwiecejWizytami + ", liczba wizyt: " + maxWizyt);
+        if (maxWizyt > 0) {
+            return new int[]{rokZNajwiecejWizytami, maxWizyt};
         } else {
-            System.out.println("Brak danych o wizytach.");
+            return null;
         }
     }
 
-    public static void wypiszTop5NajstarszychLekarzy(List<Lekarz> lekarze) {
-        List<Lekarz> top5Najstarszych = new ArrayList<>(5);
-        for (int i = 0; i < Math.min(5, lekarze.size()); i++) {
-            Lekarz najstarszy = null;
-            for (Lekarz lekarz : lekarze) {
-                if (!top5Najstarszych.contains(lekarz) && (najstarszy == null || lekarz.getDataUrodzenia().compareTo(najstarszy.getDataUrodzenia()) < 0)) {
-                    najstarszy = lekarz;
-                }
+    public static List<Lekarz> wypiszTop5NajstarszychLekarzy(List<Lekarz> lekarze) {
+        Collections.sort(lekarze, new Comparator<Lekarz>() {
+            public int compare(Lekarz lekarz1, Lekarz lekarz2) {
+                return lekarz1.getDataUrodzenia().compareTo(lekarz2.getDataUrodzenia());
             }
-            top5Najstarszych.add(najstarszy);
+        });
+
+        List<Lekarz> top5Najstarszych = new ArrayList<>();
+        for (int i = 0; i < Math.min(5, lekarze.size()); i++) {
+            top5Najstarszych.add(lekarze.get(i));
         }
-        System.out.println("\nTop 5 najstarszych lekarzy:");
-        for (Lekarz lekarz : top5Najstarszych) {
-            System.out.println(lekarz);
-        }
+
+        return top5Najstarszych;
     }
 
 
-    public static void wypiszTop5LekarzyZNajwiecejWizyt(List<Lekarz> lekarze) {
+    public static List<Lekarz> wypiszTop5LekarzyZNajwiecejWizyt(List<Lekarz> lekarze) {
         Map<Lekarz, Integer> licznikWizytLekarzy = new HashMap<>();
         for (Lekarz lekarz : lekarze) {
             licznikWizytLekarzy.put(lekarz, lekarz.getListaWizyt().size());
         }
+        Collections.sort(lekarze, new Comparator<Lekarz>() {
+            public int compare(Lekarz lekarz1, Lekarz lekarz2) {
+                return licznikWizytLekarzy.get(lekarz2).compareTo(licznikWizytLekarzy.get(lekarz1));
+            }
+        });
+
         List<Lekarz> top5NajwiecejWizyt = new ArrayList<>();
         for (int i = 0; i < Math.min(5, lekarze.size()); i++) {
-            Lekarz lekarzZNajwiecejWizytami = null;
-            for (Lekarz lekarz : lekarze) {
-                if (!top5NajwiecejWizyt.contains(lekarz)) {
-                    if (lekarzZNajwiecejWizytami == null || licznikWizytLekarzy.get(lekarz) > licznikWizytLekarzy.get(lekarzZNajwiecejWizytami)) {
-                        lekarzZNajwiecejWizytami = lekarz;
-                    }
-                }
-            }
-            if (lekarzZNajwiecejWizytami != null) {
-                top5NajwiecejWizyt.add(lekarzZNajwiecejWizytami);
-            }
+            top5NajwiecejWizyt.add(lekarze.get(i));
         }
-        System.out.println("\nTop 5 lekarzy z największą liczbą wizyt:");
-        for (Lekarz lekarz : top5NajwiecejWizyt) {
-            System.out.println(lekarz.getNazwisko() + " " + lekarz.getImie() + " - liczba wizyt: " + licznikWizytLekarzy.get(lekarz));
-        }
+
+        return top5NajwiecejWizyt;
     }
 
-    public static void znajdzPacjentowZCoNajmniej5Lekarzami(List<Pacjent> pacjenci) {
-        Map<Pacjent, Set<Integer>> pacjenciDoLekarzy = new HashMap<>();
+    public static List<Pacjent> znajdzPacjentowZCoNajmniej5Lekarzami(List<Pacjent> pacjenci) {
+        List<Pacjent> pacjenciSpelniajacyWarunek = new ArrayList<>();
 
         for (Pacjent pacjent : pacjenci) {
-            Set<Integer> idLekarzy = new HashSet<>();
-            for (Wizyta wizyta : pacjent.getListaWizytPacjenta()) {
-                idLekarzy.add(wizyta.getLekarz().getIdLekarza());
-            }
-            pacjenciDoLekarzy.put(pacjent, idLekarzy);
-        }
-
-        boolean znaleziono = false;
-        for (Map.Entry<Pacjent, Set<Integer>> entry : pacjenciDoLekarzy.entrySet()) {
-            if (entry.getValue().size() >= 5) {
-                Pacjent pacjent = entry.getKey();
-                System.out.println("\nPacjent " + pacjent.getImie() + " " + pacjent.getNazwisko() + " odwiedził co najmniej 5 różnych lekarzy");
-                znaleziono = true;
+            if (liczbaRoznychLekarzy(pacjent) >= 5) {
+                pacjenciSpelniajacyWarunek.add(pacjent);
             }
         }
 
-        if (!znaleziono) {
-            System.out.println("\nNie znaleziono pacjenta, który odwiedził co najmniej 5 różnych lekarzy");
-        }
+        return pacjenciSpelniajacyWarunek;
     }
 
-    public static void znajdzLekarzyZJednymPacjentem(List<Lekarz> lekarze) {
-        Map<Lekarz, Set<Integer>> lekarzeDoPacjentow = new HashMap<>();
+    private static int liczbaRoznychLekarzy(Pacjent pacjent) {
+        Set<Integer> idLekarzy = new HashSet<>();
+        for (Wizyta wizyta : pacjent.getListaWizytPacjenta()) {
+            idLekarzy.add(wizyta.getLekarz().getIdLekarza());
+        }
+        return idLekarzy.size();
+    }
+
+    public static List<Lekarz> znajdzLekarzyZJednymPacjentem(List<Lekarz> lekarze) {
+        List<Lekarz> lekarzeSpelniajacyWarunek = new ArrayList<>();
 
         for (Lekarz lekarz : lekarze) {
-            Set<Integer> idPacjentow = new HashSet<>();
-            for (Wizyta wizyta : lekarz.getListaWizyt()) {
-                idPacjentow.add(wizyta.getPacjent().getIdPacjenta());
-            }
-            lekarzeDoPacjentow.put(lekarz, idPacjentow);
-        }
-
-        boolean znaleziono = false;
-        for (Map.Entry<Lekarz, Set<Integer>> entry : lekarzeDoPacjentow.entrySet()) {
-            if (entry.getValue().size() == 1) {
-                Lekarz lekarz = entry.getKey();
-                System.out.println("\nLekarz " + lekarz.getImie() + " " + lekarz.getNazwisko() + " przyjął tylko jednego pacjenta");
-                znaleziono = true;
+            if (liczbaRoznychPacjentow(lekarz) == 1) {
+                lekarzeSpelniajacyWarunek.add(lekarz);
             }
         }
 
-        if (!znaleziono) {
-            System.out.println("\nNie znaleziono lekarza, który przyjął tylko 1 pacjenta");
+        return lekarzeSpelniajacyWarunek;
+    }
+
+    private static int liczbaRoznychPacjentow(Lekarz lekarz) {
+        Set<Integer> idPacjentow = new HashSet<>();
+        for (Wizyta wizyta : lekarz.getListaWizyt()) {
+            idPacjentow.add(wizyta.getPacjent().getIdPacjenta());
         }
+        return idPacjentow.size();
     }
 
 

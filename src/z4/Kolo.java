@@ -3,31 +3,25 @@ package z4;
 import java.util.Objects;
 
 public class Kolo extends Figura {
-    private double promien;
+    private int promien;
 
-    public Kolo(double promien, int numer) {
-        super(numer);
-        this.promien = promien;
-    }
-
-    public Kolo(double promien) {
-        super(0);
+    public Kolo(int promien) {
         this.promien = promien;
     }
 
     @Override
-    public double obwod() {
+    double obwod() {
         return 2 * Math.PI * promien;
     }
 
     @Override
-    public double pole() {
+    double pole() {
         return Math.PI * promien * promien;
     }
 
     @Override
-    protected String opis() {
-        return "Koło o promieniu " + promien;
+    public String toString() {
+        return "Figura nr " + numer + ": Koło o promienu " + promien + ".";
     }
 
     @Override
@@ -35,7 +29,7 @@ public class Kolo extends Figura {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Kolo kolo = (Kolo) o;
-        return Double.compare(kolo.promien, promien) == 0;
+        return promien == kolo.promien;
     }
 
     @Override
@@ -43,3 +37,6 @@ public class Kolo extends Figura {
         return Objects.hash(promien);
     }
 }
+
+
+

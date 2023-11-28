@@ -83,5 +83,6 @@ b) Następnie:
 
 c) System.out.prinltn(figuryPunktA.contains(new Kwadrat(10)); //powinno wypisc true
 
-UWAGA: tylko figury tworzone metodą fabryczną powinny mieć nadawany sekwencyjnie numer, w przypadku gdy uzywamy konstruktora to kazda
+UWAGA: tylko figury tworzone metodą fabryczną powinny mieć nadawany sekwencyjnie numer,
+w przypadku gdy uzywamy konstruktora to kazda
 figura ma numer 0.

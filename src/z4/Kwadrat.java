@@ -3,31 +3,25 @@ package z4;
 import java.util.Objects;
 
 public class Kwadrat extends Figura {
-    private double bok;
+    private int bok;
 
-    public Kwadrat(double bok, int numer) {
-        super(numer);
-        this.bok = bok;
-    }
-
-    public Kwadrat(double bok) {
-        super(0);
+    public Kwadrat(int bok) {
         this.bok = bok;
     }
 
     @Override
-    public double obwod() {
+    double obwod() {
         return 4 * bok;
     }
 
     @Override
-    public double pole() {
+    double pole() {
         return bok * bok;
     }
 
     @Override
-    protected String opis() {
-        return "Kwadrat o boku " + bok + ".";
+    public String toString() {
+        return "Figura nr " + numer + ": Kwadrat o boku " + bok + ".";
     }
 
     @Override
@@ -35,7 +29,7 @@ public class Kwadrat extends Figura {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Kwadrat kwadrat = (Kwadrat) o;
-        return Double.compare(kwadrat.bok, bok) == 0;
+        return bok == kwadrat.bok;
     }
 
     @Override
@@ -43,4 +37,3 @@ public class Kwadrat extends Figura {
         return Objects.hash(bok);
     }
 }
-

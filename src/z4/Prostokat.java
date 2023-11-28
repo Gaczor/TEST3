@@ -3,35 +3,26 @@ package z4;
 import java.util.Objects;
 
 public class Prostokat extends Figura {
-    private double szerokosc;
-    private double wysokosc;
+    private int dlugosc, szerokosc;
 
-    public Prostokat(double szerokosc, double wysokosc, int numer) {
-        super(numer);
+    public Prostokat(int dlugosc, int szerokosc) {
+        this.dlugosc = dlugosc;
         this.szerokosc = szerokosc;
-        this.wysokosc = wysokosc;
-    }
-
-    public Prostokat(double szerokosc, double wysokosc) {
-        super(0);
-        this.szerokosc = szerokosc;
-        this.wysokosc = wysokosc;
-    }
-
-
-    @Override
-    public double obwod() {
-        return 2 * (szerokosc + wysokosc);
     }
 
     @Override
-    public double pole() {
-        return szerokosc * wysokosc;
+    double obwod() {
+        return 2 * (dlugosc + szerokosc);
     }
 
     @Override
-    protected String opis() {
-        return "Prostokąt o bokach " + szerokosc + "x" + wysokosc;
+    double pole() {
+        return dlugosc * szerokosc;
+    }
+
+    @Override
+    public String toString() {
+        return "Figura nr " + numer + ": Prostokat o bokach " + dlugosc + "x" + szerokosc + ".";
     }
 
     @Override
@@ -39,11 +30,11 @@ public class Prostokat extends Figura {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Prostokat prostokat = (Prostokat) o;
-        return Double.compare(prostokat.szerokosc, szerokosc) == 0 && Double.compare(prostokat.wysokosc, wysokosc) == 0;
+        return dlugosc == prostokat.dlugosc && szerokosc == prostokat.szerokosc;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(szerokosc, wysokosc);
+        return Objects.hash(dlugosc, szerokosc);
     }
 }
