@@ -5,21 +5,24 @@ public abstract class Figura {
     protected int numer;
 
     public Figura() {
-        licznik++;
-        this.numer = licznik;
     }
 
-
     public static Figura stworzKwadrat(int bok) {
-        return new Kwadrat(bok);
+        Kwadrat kwadrat = new Kwadrat(bok);
+        kwadrat.setNumer(++licznik);
+        return kwadrat;
     }
 
     public static Figura stworzKolo(int promien) {
-        return new Kolo(promien);
+        Kolo kolo = new Kolo(promien);
+        kolo.setNumer(++licznik);
+        return kolo;
     }
 
     public static Figura stworzProstokat(int dlugosc, int szerokosc) {
-        return new Prostokat(dlugosc, szerokosc);
+        Prostokat prostokat = new Prostokat(dlugosc, szerokosc);
+        prostokat.setNumer(++licznik);
+        return prostokat;
     }
 
     public Figura(int numer) {
