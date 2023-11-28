@@ -13,8 +13,7 @@ public class Main {
         System.out.println("Figura z największym obwodem: " + znajdzFigureZNajwiekszymObwodem(figury));
         System.out.println("Figura z największym polem: " + znajdzFigureZNajwiekszymPolem(figury));
         System.out.println(figuryPunktA.contains(new Kwadrat(10)));
-
-        }
+    }
 
 
     private static Figura znajdzFigureZNajwiekszymObwodem(Figura[] figury) {

@@ -38,6 +38,7 @@ public abstract class Figura {
     }
 
     abstract double obwod();
+
     abstract double pole();
 
     @Override
